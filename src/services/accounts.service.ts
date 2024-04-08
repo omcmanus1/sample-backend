@@ -1,5 +1,5 @@
-import moment from "moment";
 import Account from "../mongodb/models/Account";
+import { createRequest, updateRequest } from "./requests.service";
 
 type AccountDetails = {
   username: string;
@@ -7,6 +7,8 @@ type AccountDetails = {
   firstName: string;
   lastName: string;
   email: string;
+  status: "active" | "deleted";
+  AccountRequest: "active" | "deleted";
   createdAt: Date;
   updatedAt?: Date;
   deletedAt?: Date;
@@ -39,10 +41,24 @@ export const getAccountById = async (accountId: string) => {
 };
 
 export const createAccount = async (accountDetails: AccountDetails) => {
+  let requestId;
   try {
-    const createdAccount = await Account.create(accountDetails);
-    return createdAccount;
+    requestId = await createRequest("create");
+    const account = await Account.create(accountDetails);
+    if (account.createdAt && requestId) {
+      await updateRequest({
+        requestId,
+        status: "successful",
+      });
+    }
+    return account;
   } catch (err) {
+    if (requestId) {
+      await updateRequest({
+        requestId,
+        status: "failed",
+      });
+    }
     if (err instanceof Error) {
       throw new Error(err.message);
     } else {
@@ -53,8 +69,37 @@ export const createAccount = async (accountDetails: AccountDetails) => {
 
 export const deleteAccount = async (accountId: string) => {
   try {
-    const deletedAccount = await Account.deleteOne({ _id: accountId });
-    return deletedAccount;
+    const deleted = await Account.deleteOne({ _id: accountId });
+    return deleted;
+  } catch (err) {
+    if (err instanceof Error) {
+      throw new Error(err.message);
+    } else {
+      throw new Error("An unknown error occurred");
+    }
+  }
+};
+
+export const softDeleteAccount = async (accountId: string) => {
+  try {
+    const deleted = await Account.updateOne(
+      { _id: accountId },
+      { deletedAt: new Date() }
+    );
+    return deleted;
+  } catch (err) {
+    if (err instanceof Error) {
+      throw new Error(err.message);
+    } else {
+      throw new Error("An unknown error occurred");
+    }
+  }
+};
+
+export const deleteAllAccounts = async () => {
+  try {
+    const deleted = await Account.deleteMany({});
+    return deleted;
   } catch (err) {
     if (err instanceof Error) {
       throw new Error(err.message);
