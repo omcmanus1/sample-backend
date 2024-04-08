@@ -17,6 +17,9 @@ export const getAccountById = async (req: Request, res: Response) => {
   const { accountId } = req.params;
   try {
     const account = await services.accounts.getAccountById(accountId);
+    if (!account) {
+      return res.status(404).send({ error: "Account not found" });
+    }
     return res.status(200).send(account);
   } catch (err) {
     if (err instanceof Error) {
@@ -30,8 +33,14 @@ export const getAccountById = async (req: Request, res: Response) => {
 export const createAccount = async (req: Request, res: Response) => {
   const accountDetails = req.body;
   try {
-    const createdAccount = await services.accounts.createAccount(accountDetails);
-    return res.status(200).send(createdAccount);
+    const createdAccount = await services.accounts.createAccount(
+      accountDetails
+    );
+    return res
+      .status(200)
+      .send({
+        message: `Account ${createdAccount.username} created successfully`,
+      });
   } catch (err) {
     if (err instanceof Error) {
       res.status(500).send({ error: err.message });
@@ -44,8 +53,11 @@ export const createAccount = async (req: Request, res: Response) => {
 export const deleteAccount = async (req: Request, res: Response) => {
   const { accountId } = req.params;
   try {
-    const deletedAccount = await services.accounts.deleteAccount(accountId);
-    return res.status(200).send(deletedAccount);
+    const deletionResult = await services.accounts.deleteAccount(accountId);
+    if (!deletionResult.deletedCount) {
+      return res.status(404).send({ error: "Account not found" });
+    }
+    return res.status(200).send({ message: "Account deleted successfully" });
   } catch (err) {
     if (err instanceof Error) {
       res.status(500).send({ error: err.message });

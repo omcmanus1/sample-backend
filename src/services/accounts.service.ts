@@ -40,10 +40,7 @@ export const getAccountById = async (accountId: string) => {
 
 export const createAccount = async (accountDetails: AccountDetails) => {
   try {
-    const createdAccount = await Account.create({
-      ...accountDetails,
-      createdAt: moment().format(),
-    });
+    const createdAccount = await Account.create(accountDetails);
     return createdAccount;
   } catch (err) {
     if (err instanceof Error) {
