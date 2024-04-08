@@ -64,10 +64,12 @@ export const deleteAccount = async (accountId: string) => {
   try {
     requestId = await createRequest("delete");
     const deleted = await Account.deleteOne({ _id: accountId });
-    await updateRequest({
-      requestId,
-      status: deleted.acknowledged && requestId ? "successful" : "failed",
-    });
+    if (requestId) {
+      await updateRequest({
+        requestId,
+        status: deleted.acknowledged ? "successful" : "failed",
+      });
+    }
     return deleted;
   } catch (err) {
     if (err instanceof Error) {
@@ -98,10 +100,12 @@ export const softDeleteAccount = async (accountId: string) => {
       { _id: accountId },
       { status: "deleted", deletedAt: new Date() }
     );
-    await updateRequest({
-      requestId,
-      status: deleted.acknowledged && requestId ? "successful" : "failed",
-    });
+    if (requestId) {
+      await updateRequest({
+        requestId,
+        status: deleted.acknowledged ? "successful" : "failed",
+      });
+    }
     return accountId;
   } catch (err) {
     if (err instanceof Error) {
@@ -117,10 +121,12 @@ export const deleteAllAccounts = async () => {
   try {
     requestId = await createRequest("delete");
     const deleted = await Account.deleteMany({});
-    await updateRequest({
-      requestId,
-      status: deleted.acknowledged && requestId ? "successful" : "failed",
-    });
+    if (requestId) {
+      await updateRequest({
+        requestId,
+        status: deleted.acknowledged ? "successful" : "failed",
+      });
+    }
     return deleted;
   } catch (err) {
     if (err instanceof Error) {
