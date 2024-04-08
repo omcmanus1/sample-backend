@@ -39,7 +39,7 @@ export const createRequest = async (type: OperationType) => {
       type,
       status: "pending",
     });
-    return newRequest.requestId;
+    return newRequest.requestId || "";
   } catch (err) {
     if (err instanceof Error) {
       throw new Error(err.message);
