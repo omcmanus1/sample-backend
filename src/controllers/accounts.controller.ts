@@ -40,9 +40,11 @@ export const createAccount = async (req: Request, res: Response) => {
   }
   try {
     const account = await services.accounts.createAccount(accountDetails);
-    return res.status(200).send({
-      message: `Account ${account.username} created successfully`,
-    });
+    if (account) {
+      return res.status(200).send({
+        message: `Account ${account.username} created successfully`,
+      });
+    }
   } catch (err) {
     if (err instanceof Error) {
       res.status(500).send({ error: err.message });
@@ -59,7 +61,7 @@ export const deleteAccount = async (req: Request, res: Response) => {
   }
   try {
     const deletionResult = await services.accounts.deleteAccount(accountId);
-    if (!deletionResult.deletedCount) {
+    if (deletionResult && !deletionResult.deletedCount) {
       return res.status(404).send({ error: "Account not found" });
     }
     return res.status(200).send({ message: "Account deleted successfully" });
@@ -94,7 +96,7 @@ export const softDeleteAccount = async (req: Request, res: Response) => {
 export const deleteAllAccounts = async (req: Request, res: Response) => {
   try {
     const deletionResult = await services.accounts.deleteAllAccounts();
-    if (!deletionResult.deletedCount) {
+    if (deletionResult && !deletionResult.deletedCount) {
       return res.status(404).send({ error: "No accounts found" });
     }
     return res.status(200).send({ message: "Accounts deleted successfully" });
