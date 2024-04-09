@@ -23,6 +23,9 @@ export const getRequestById = async (requestId: string) => {
   }
 };
 
+// Called at the beginning of the service file for each account endpoint
+// Creates a likely unique ID to pass to update function for mutating
+// Creates a new request entry with a "pending" status until outcome is determined
 export const createRequest = async (type: OperationType) => {
   const requestId = new Types.ObjectId().toString();
   try {
@@ -40,6 +43,9 @@ export const createRequest = async (type: OperationType) => {
   }
 };
 
+// Called after DB processing operation for each account endpoint
+// "successful" or "failed" passed in as status depending on outcome
+// Mutates existing request object (referenced by requestId)
 export const updateRequest = async ({
   requestId,
   status,
