@@ -1,6 +1,14 @@
-export const handleError = (err: unknown) => {
+import { updateRequest } from "../services/requests.service";
+
+export const handleError = async (err: unknown, requestId?: string) => {
+  if (requestId) {
+    await updateRequest({
+      requestId,
+      status: "failed",
+    });
+  }
   if (err instanceof Error) {
-    throw new Error(err.message);
+    throw err;
   } else {
     throw new Error("An unknown error occurred");
   }

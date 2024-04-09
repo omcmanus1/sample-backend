@@ -1,3 +1,4 @@
+import { isValidObjectId } from "mongoose";
 import Account from "../mongodb/models/Account";
 import { handleError } from "../utils";
 import { createRequest, updateRequest } from "./requests.service";
@@ -17,18 +18,29 @@ type AccountDetails = {
 export const getAccounts = async () => {
   try {
     const accounts = await Account.find();
-    return accounts;
+    if (accounts) {
+      return accounts;
+    } else {
+      throw new Error("Something went wrong");
+    }
   } catch (err) {
     handleError(err);
   }
 };
 
-export const getAccountById = async (accountId: string) => {
+export const getAccountById = async (accountId: string, requestId?: string) => {
   try {
-    const accounts = await Account.findById(accountId);
-    return accounts;
+    if (!isValidObjectId(accountId)) {
+      throw new Error("Invalid ID");
+    }
+    const account = await Account.findById(accountId);
+    if (account) {
+      return account;
+    } else {
+      throw new Error("Something went wrong");
+    }
   } catch (err) {
-    handleError(err);
+    handleError(err, requestId);
   }
 };
 
@@ -43,7 +55,11 @@ export const createAccount = async (accountDetails: AccountDetails) => {
         status: account.createdAt && requestId ? "successful" : "failed",
       });
     }
-    return account;
+    if (account.createdAt) {
+      return account;
+    } else {
+      throw new Error("Something went wrong");
+    }
   } catch (err) {
     handleError(err);
   }
@@ -60,7 +76,11 @@ export const deleteAccount = async (accountId: string) => {
         status: deleted.acknowledged ? "successful" : "failed",
       });
     }
-    return deleted;
+    if (deleted.acknowledged) {
+      return deleted;
+    } else {
+      throw new Error("Something went wrong");
+    }
   } catch (err) {
     handleError(err);
   }
@@ -71,14 +91,20 @@ export const softDeleteAccount = async (accountId: string) => {
   try {
     requestId = await createRequest("delete");
 
-    const account = await getAccountById(accountId);
-    if (account && account.status === "deleted") {
-      if (requestId) {
-        await updateRequest({
-          requestId,
-          status: "failed",
-        });
-      }
+    // check existing account records
+    const account = await getAccountById(accountId, requestId);
+    if (!account && requestId) {
+      await updateRequest({
+        requestId,
+        status: "failed",
+      });
+      throw new Error("Account does not exist ");
+    }
+    if (account && account.status === "deleted" && requestId) {
+      await updateRequest({
+        requestId,
+        status: "failed",
+      });
       throw new Error("Account already deleted");
     }
 
@@ -92,9 +118,13 @@ export const softDeleteAccount = async (accountId: string) => {
         status: deleted.acknowledged ? "successful" : "failed",
       });
     }
-    return accountId;
+    if (account) {
+      return accountId;
+    } else {
+      throw new Error("Something went wrong");
+    }
   } catch (err) {
-    handleError(err);
+    handleError(err, requestId);
   }
 };
 
@@ -109,7 +139,11 @@ export const deleteAllAccounts = async () => {
         status: deleted.acknowledged ? "successful" : "failed",
       });
     }
-    return deleted;
+    if (deleted.acknowledged) {
+      return deleted;
+    } else {
+      throw new Error("Something went wrong");
+    }
   } catch (err) {
     handleError(err);
   }

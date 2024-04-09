@@ -81,6 +81,11 @@ export const softDeleteAccount = async (req: Request, res: Response) => {
   }
   try {
     const deletionResult = await services.accounts.softDeleteAccount(accountId);
+    if (!deletionResult) {
+      return res
+        .status(500)
+        .send({ error: "Account soft-deletion unsuccessful" });
+    }
     return res
       .status(200)
       .send({ message: `Account ${deletionResult} soft-deleted successfully` });
