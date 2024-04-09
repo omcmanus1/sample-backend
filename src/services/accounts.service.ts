@@ -8,7 +8,6 @@ type AccountDetails = {
   lastName: string;
   email: string;
   status: "active" | "deleted";
-  AccountRequest: "active" | "deleted";
   createdAt: Date;
   updatedAt?: Date;
   deletedAt?: Date;

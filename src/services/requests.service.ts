@@ -1,6 +1,8 @@
 import { Types } from "mongoose";
 import Request from "../mongodb/models/Requests";
-import { OperationType, Status } from "../types";
+
+type Status = "pending" | "successful" | "failed";
+type OperationType = "create" | "update" | "delete";
 
 export const getAllRequests = async () => {
   try {
