@@ -1,5 +1,6 @@
 import { Types } from "mongoose";
 import Request from "../mongodb/models/Requests";
+import { handleError } from "../utils";
 
 type Status = "pending" | "successful" | "failed";
 type OperationType = "create" | "update" | "delete";
@@ -9,11 +10,7 @@ export const getAllRequests = async () => {
     const allRequests = await Request.find();
     return allRequests;
   } catch (err) {
-    if (err instanceof Error) {
-      throw new Error(err.message);
-    } else {
-      throw new Error("An unknown error occurred");
-    }
+    handleError(err);
   }
 };
 
@@ -22,11 +19,7 @@ export const getRequestById = async (requestId: string) => {
     const requestEntry = await Request.findById(requestId);
     return requestEntry;
   } catch (err) {
-    if (err instanceof Error) {
-      throw new Error(err.message);
-    } else {
-      throw new Error("An unknown error occurred");
-    }
+    handleError(err);
   }
 };
 
@@ -43,11 +36,7 @@ export const createRequest = async (type: OperationType) => {
     });
     return newRequest.requestId || "";
   } catch (err) {
-    if (err instanceof Error) {
-      throw new Error(err.message);
-    } else {
-      throw new Error("An unknown error occurred");
-    }
+    handleError(err);
   }
 };
 
@@ -65,10 +54,6 @@ export const updateRequest = async ({
     const request = await Request.updateOne({ requestId }, { status });
     return request;
   } catch (err) {
-    if (err instanceof Error) {
-      throw new Error(err.message);
-    } else {
-      throw new Error("An unknown error occurred");
-    }
+    handleError(err);
   }
 };

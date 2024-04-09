@@ -1,4 +1,5 @@
 import Account from "../mongodb/models/Account";
+import { handleError } from "../utils";
 import { createRequest, updateRequest } from "./requests.service";
 
 type AccountDetails = {
@@ -18,11 +19,7 @@ export const getAccounts = async () => {
     const accounts = await Account.find();
     return accounts;
   } catch (err) {
-    if (err instanceof Error) {
-      throw new Error(err.message);
-    } else {
-      throw new Error("An unknown error occurred");
-    }
+    handleError(err);
   }
 };
 
@@ -31,11 +28,7 @@ export const getAccountById = async (accountId: string) => {
     const accounts = await Account.findById(accountId);
     return accounts;
   } catch (err) {
-    if (err instanceof Error) {
-      throw new Error(err.message);
-    } else {
-      throw new Error("An unknown error occurred");
-    }
+    handleError(err);
   }
 };
 
@@ -44,17 +37,15 @@ export const createAccount = async (accountDetails: AccountDetails) => {
   try {
     requestId = await createRequest("create");
     const account = await Account.create(accountDetails);
-    await updateRequest({
-      requestId,
-      status: account.createdAt && requestId ? "successful" : "failed",
-    });
+    if (requestId) {
+      await updateRequest({
+        requestId,
+        status: account.createdAt && requestId ? "successful" : "failed",
+      });
+    }
     return account;
   } catch (err) {
-    if (err instanceof Error) {
-      throw new Error(err.message);
-    } else {
-      throw new Error("An unknown error occurred");
-    }
+    handleError(err);
   }
 };
 
@@ -71,11 +62,7 @@ export const deleteAccount = async (accountId: string) => {
     }
     return deleted;
   } catch (err) {
-    if (err instanceof Error) {
-      throw new Error(err.message);
-    } else {
-      throw new Error("An unknown error occurred");
-    }
+    handleError(err);
   }
 };
 
@@ -107,11 +94,7 @@ export const softDeleteAccount = async (accountId: string) => {
     }
     return accountId;
   } catch (err) {
-    if (err instanceof Error) {
-      throw new Error(err.message);
-    } else {
-      throw new Error("An unknown error occurred");
-    }
+    handleError(err);
   }
 };
 
@@ -128,10 +111,6 @@ export const deleteAllAccounts = async () => {
     }
     return deleted;
   } catch (err) {
-    if (err instanceof Error) {
-      throw new Error(err.message);
-    } else {
-      throw new Error("An unknown error occurred");
-    }
+    handleError(err);
   }
 };
