@@ -40,9 +40,12 @@ export const createAccount = async (req: Request, res: Response) => {
     return res.status(404).send({ error: "No data provided." });
   }
   try {
-    const account = await services.accounts.createAccount(accountDetails);
+    const { account, requestId } = await services.accounts.createAccount(
+      accountDetails
+    );
     if (account) {
       return res.status(200).send({
+        requestId,
         message: `Account ${account.username} created successfully`,
       });
     }
@@ -61,11 +64,15 @@ export const deleteAccount = async (req: Request, res: Response) => {
     return res.status(404).send({ error: "No ID provided." });
   }
   try {
-    const deletionResult = await services.accounts.deleteAccount(accountId);
-    if (deletionResult && !deletionResult.deletedCount) {
+    const { deleted, requestId } = await services.accounts.deleteAccount(
+      accountId
+    );
+    if (deleted && !deleted.deletedCount) {
       return res.status(404).send({ error: "Account not found" });
     }
-    return res.status(200).send({ message: "Account deleted successfully" });
+    return res
+      .status(200)
+      .send({ requestId, message: "Account deleted successfully" });
   } catch (err) {
     if (err instanceof Error) {
       res.status(500).send({ error: err.message });
@@ -81,15 +88,17 @@ export const softDeleteAccount = async (req: Request, res: Response) => {
     return res.status(404).send({ error: "No ID provided." });
   }
   try {
-    const deletionResult = await services.accounts.softDeleteAccount(accountId);
-    if (!deletionResult) {
+    const { requestId, accountId: deleted } =
+      await services.accounts.softDeleteAccount(accountId);
+    if (!deleted) {
       return res
         .status(500)
-        .send({ error: "Account soft-deletion unsuccessful" });
+        .send({ requestId, error: "Account soft-deletion unsuccessful" });
     }
-    return res
-      .status(200)
-      .send({ message: `Account ${deletionResult} soft-deleted successfully` });
+    return res.status(200).send({
+      requestId,
+      message: `Account ${deleted} soft-deleted successfully`,
+    });
   } catch (err) {
     if (err instanceof Error) {
       res.status(500).send({ error: err.message });
@@ -101,11 +110,13 @@ export const softDeleteAccount = async (req: Request, res: Response) => {
 
 export const deleteAllAccounts = async (req: Request, res: Response) => {
   try {
-    const deletionResult = await services.accounts.deleteAllAccounts();
-    if (deletionResult && !deletionResult.deletedCount) {
-      return res.status(404).send({ error: "No accounts found" });
+    const { deleted, requestId } = await services.accounts.deleteAllAccounts();
+    if (deleted && !deleted.deletedCount) {
+      return res.status(404).send({ requestId, error: "No accounts found" });
     }
-    return res.status(200).send({ message: "Accounts deleted successfully" });
+    return res
+      .status(200)
+      .send({ requestId, message: "Accounts deleted successfully" });
   } catch (err) {
     if (err instanceof Error) {
       res.status(500).send({ error: err.message });

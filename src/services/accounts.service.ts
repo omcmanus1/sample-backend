@@ -56,7 +56,7 @@ export const createAccount = async (accountDetails: AccountDetails) => {
       });
     }
     if (account.createdAt) {
-      return account;
+      return { account, requestId };
     } else {
       throw new Error("Something went wrong");
     }
@@ -77,7 +77,7 @@ export const deleteAccount = async (accountId: string) => {
       });
     }
     if (deleted.acknowledged) {
-      return deleted;
+      return { deleted, requestId };
     } else {
       throw new Error("Something went wrong");
     }
@@ -112,6 +112,7 @@ export const softDeleteAccount = async (accountId: string) => {
       { _id: accountId },
       { status: "deleted", deletedAt: new Date() }
     );
+    console.log("🚀 ~ softDeleteAccount ~ deleted:", deleted);
     if (requestId) {
       await updateRequest({
         requestId,
@@ -119,7 +120,7 @@ export const softDeleteAccount = async (accountId: string) => {
       });
     }
     if (account) {
-      return accountId;
+      return { accountId, requestId };
     } else {
       throw new Error("Something went wrong");
     }
@@ -140,7 +141,7 @@ export const deleteAllAccounts = async () => {
       });
     }
     if (deleted.acknowledged) {
-      return deleted;
+      return { deleted, requestId };
     } else {
       throw new Error("Something went wrong");
     }
