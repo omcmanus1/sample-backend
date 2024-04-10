@@ -24,7 +24,7 @@ export const getAccounts = async () => {
       throw new Error("Something went wrong");
     }
   } catch (err) {
-    handleError(err);
+    return handleError(err);
   }
 };
 
@@ -40,7 +40,7 @@ export const getAccountById = async (accountId: string, requestId?: string) => {
       throw new Error("Something went wrong");
     }
   } catch (err) {
-    handleError(err, requestId);
+    return handleError(err, requestId);
   }
 };
 
@@ -61,7 +61,7 @@ export const createAccount = async (accountDetails: AccountDetails) => {
       throw new Error("Something went wrong");
     }
   } catch (err) {
-    handleError(err);
+    return handleError(err);
   }
 };
 
@@ -82,7 +82,7 @@ export const deleteAccount = async (accountId: string) => {
       throw new Error("Something went wrong");
     }
   } catch (err) {
-    handleError(err);
+    return handleError(err);
   }
 };
 
@@ -124,7 +124,7 @@ export const softDeleteAccount = async (accountId: string) => {
       throw new Error("Something went wrong");
     }
   } catch (err) {
-    handleError(err, requestId);
+    return handleError(err, requestId);
   }
 };
 
@@ -145,6 +145,6 @@ export const deleteAllAccounts = async () => {
       throw new Error("Something went wrong");
     }
   } catch (err) {
-    handleError(err);
+    return handleError(err);
   }
 };
