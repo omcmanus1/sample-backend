@@ -13,6 +13,7 @@ export const getAccounts = async (req: Request, res: Response) => {
     }
   }
 };
+
 export const getAccountById = async (req: Request, res: Response) => {
   const { accountId } = req.params;
   if (!accountId) {
@@ -35,7 +36,7 @@ export const getAccountById = async (req: Request, res: Response) => {
 
 export const createAccount = async (req: Request, res: Response) => {
   const accountDetails = req.body;
-  if (!accountDetails) {
+  if (!Object.keys(accountDetails).length) {
     return res.status(404).send({ error: "No data provided." });
   }
   try {
