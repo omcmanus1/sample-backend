@@ -112,7 +112,6 @@ export const softDeleteAccount = async (accountId: string) => {
       { _id: accountId },
       { status: "deleted", deletedAt: new Date() }
     );
-    console.log("🚀 ~ softDeleteAccount ~ deleted:", deleted);
     if (requestId) {
       await updateRequest({
         requestId,
